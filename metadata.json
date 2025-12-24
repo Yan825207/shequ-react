@@ -1,0 +1,7 @@
+{
+  "name": "CommunityApp",
+  "description": "A cross-platform community application built with UniApp and Node.js.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
