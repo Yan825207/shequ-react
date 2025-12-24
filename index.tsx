@@ -42,6 +42,8 @@ import {
 
 // --- 1. 配置与工具 ---
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const getBaseHost = () => {
   const hostname = window.location.hostname;
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
@@ -50,8 +52,10 @@ const getBaseHost = () => {
   return hostname || "127.0.0.1";
 };
 
-const SERVER_HOST = `http://${getBaseHost()}:5000`;
-const API_BASE_URL = `${SERVER_HOST}/api/v1`;
+// 使用动态协议，避免混合内容问题
+const protocol = isProduction ? 'https://' : 'http://';
+const SERVER_HOST = isProduction ? 'shequ-node.vercel.app' : `${getBaseHost()}:5000`;
+const API_BASE_URL = `${protocol}${SERVER_HOST}/api/v1`;
 
 const CATEGORIES = [
   { label: '公告', value: '公告' },

@@ -1,8 +1,6 @@
 
 // 根据环境变量选择接口地址
-// const isProduction = process.env.NODE_ENV === 'production';
-// 临时设置为 true 测试生产接口
-const isProduction = true; // process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === 'production';
 export const BASE_URL = isProduction 
   ? 'https://shequ-node.vercel.app' 
   : 'http://127.0.0.1:5000';
@@ -17,34 +15,91 @@ export const formatUrl = (url) => {
   return `${BASE_URL}${path}`;
 };
 
+// 本地存储工具函数
+const storage = {
+  get: (key) => {
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      return null;
+    }
+  },
+  set: (key, value) => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      console.error('Storage error:', e);
+    }
+  },
+  remove: (key) => {
+    try {
+      localStorage.removeItem(key);
+    } catch (e) {
+      console.error('Storage error:', e);
+    }
+  }
+};
+
+// 导航工具函数
+const navigate = {
+  to: (url) => {
+    // 对于React应用，通常使用路由库进行导航
+    // 这里使用简单的页面跳转作为 fallback
+    window.location.href = url;
+  }
+};
+
+// 消息提示工具函数
+const showToast = (options) => {
+  // 简单的消息提示实现
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: 4px;
+    z-index: 9999;
+  `;
+  toast.textContent = options.title;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    document.body.removeChild(toast);
+  }, 2000);
+};
+
 export const request = (options) => {
-  const token = uni.getStorageSync('token');
+  const token = storage.get('token');
   return new Promise((resolve, reject) => {
-    uni.request({
-      url: options.url.startsWith('http') ? options.url : API_URL + options.url,
+    fetch(options.url.startsWith('http') ? options.url : API_URL + options.url, {
       method: options.method || 'GET',
-      data: options.data || {},
-      header: {
+      headers: {
+        'Content-Type': 'application/json',
         'Authorization': token ? `Bearer ${token}` : '',
         ...options.header
       },
-      success: (res) => {
-        // 兼容处理：有些接口返回带 code 的对象，有些严格按照文档直接返回数据数组/对象
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(res.data);
-        } else if (res.statusCode === 401) {
-          uni.removeStorageSync('token');
-          uni.navigateTo({ url: '/pages/login/login' });
-          reject(res.data);
-        } else {
-          uni.showToast({ title: res.data.message || 'Error', icon: 'none' });
-          reject(res.data);
-        }
-      },
-      fail: (err) => {
-        uni.showToast({ title: 'Network error', icon: 'none' });
-        reject(err);
+      body: options.data ? JSON.stringify(options.data) : undefined
+    })
+    .then(async (res) => {
+      const data = await res.json();
+      // 兼容处理：有些接口返回带 code 的对象，有些严格按照文档直接返回数据数组/对象
+      if (res.ok) {
+        resolve(data);
+      } else if (res.status === 401) {
+        storage.remove('token');
+        navigate.to('/login');
+        reject(data);
+      } else {
+        showToast({ title: data.message || 'Error' });
+        reject(data);
       }
+    })
+    .catch((err) => {
+      showToast({ title: 'Network error' });
+      reject(err);
     });
   });
 };
