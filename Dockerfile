@@ -33,6 +33,3 @@ EXPOSE 3000
 
 # 启动服务器
 CMD ["serve", "-s", "dist", "-l", "3000"]
-
-# 启动 Nginx
-CMD ["nginx", "-g", "daemon off;"]
