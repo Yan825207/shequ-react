@@ -17,16 +17,22 @@ COPY . .
 RUN npm run build
 
 # 第二阶段：运行应用
-FROM nginx:alpine
+FROM node:18-alpine
 
-# 复制构建产物到 Nginx 静态文件目录
-COPY --from=build /app/dist /usr/share/nginx/html
+# 设置工作目录
+WORKDIR /app
 
-# 复制自定义 Nginx 配置
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# 安装静态文件服务器
+RUN npm install -g serve
+
+# 复制构建产物
+COPY --from=build /app/dist /app/dist
 
 # 暴露端口
-EXPOSE 80
+EXPOSE 3000
+
+# 启动服务器
+CMD ["serve", "-s", "dist", "-l", "3000"]
 
 # 启动 Nginx
 CMD ["nginx", "-g", "daemon off;"]
