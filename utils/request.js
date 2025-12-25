@@ -4,7 +4,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 // export const BASE_URL = isProduction 
 //   ? 'https://shequ-node.vercel.app' 
 //   : 'http://127.0.0.1:5000';、
-export const BASE_URL = 'https://shequ-node.vercel.app' 
+export const BASE_URL = 'https://shequ-node1-211409-7-1307840261.sh.run.tcloudbase.com'
 export const API_URL = `${BASE_URL}/api/v1`;
 
 export const formatUrl = (url) => {

@@ -54,7 +54,7 @@ const getBaseHost = () => {
 
 // 使用动态协议，避免混合内容问题
 const protocol = isProduction ? 'https://' : 'http://';
-const SERVER_HOST = isProduction ? 'shequ-node.vercel.app' : `${getBaseHost()}:5000`;
+const SERVER_HOST = isProduction ? 'shequ-node1-211409-7-1307840261.sh.run.tcloudbase.com' : `${getBaseHost()}:5000`;
 const API_BASE_URL = `${protocol}${SERVER_HOST}/api/v1`;
 
 const CATEGORIES = [
