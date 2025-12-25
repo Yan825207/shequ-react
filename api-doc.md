@@ -1192,8 +1192,7 @@ GET /api/v1/follows/check/2
 
 ## 9. 项目结构
 
-```
-backend/
+```kend/
 ├── app.js                # 主应用入口
 ├── controllers/          # 控制器
 │   ├── userController.js     # 用户相关控制器
